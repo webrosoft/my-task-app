@@ -5,6 +5,7 @@ function App() {
   const [items, setItems] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [weight, setWeight] = useState("");
   const [editingItem, setEditingItem] = useState(null);
 
   useEffect(() => {
@@ -18,9 +19,10 @@ function App() {
 
   const handleAdd = async () => {
     if (!name.trim()) return;
-    await addItem({ name, description });
+    await addItem({ name, description, weight: parseFloat(weight) || 0 });
     setName("");
     setDescription("");
+    setWeight("");
     loadItems();
   };
 
@@ -28,13 +30,19 @@ function App() {
     setEditingItem(item);
     setName(item.name);
     setDescription(item.description);
+    setWeight(item.weight ?? "");  // Fallback if weight is null
   };
 
   const handleUpdate = async () => {
-    await updateItem(editingItem.id, { name, description });
+    await updateItem(editingItem.id, {
+      name,
+      description,
+      weight: parseFloat(weight) || 0,
+    });
     setEditingItem(null);
     setName("");
     setDescription("");
+    setWeight("");
     loadItems();
   };
 
@@ -49,29 +57,35 @@ function App() {
         Item Manager
       </h1>
 
-      {/* ✅ Updated form with Enter key support */}
       <form
-        className="flex flex-col md:flex-row gap-2 mb-6"
+        className="flex flex-col md:flex-row gap-2 mb-6 flex-wrap"
         onSubmit={(e) => {
           e.preventDefault();
           editingItem ? handleUpdate() : handleAdd();
         }}
       >
         <input
-          className="border p-2 rounded w-full md:w-1/3"
+          className="border p-2 rounded w-full md:w-1/4"
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
         <input
-          className="border p-2 rounded w-full md:w-1/3"
+          className="border p-2 rounded w-full md:w-1/4"
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+        <input
+          className="border p-2 rounded w-full md:w-1/4"
+          placeholder="Weight"
+          type="number"
+          value={weight}
+          onChange={(e) => setWeight(e.target.value)}
+        />
         <button
           type="submit"
-          className={`px-4 py-2 rounded text-white ${
+          className={`px-4 py-2 rounded text-white w-full md:w-auto ${
             editingItem ? "bg-yellow-500" : "bg-blue-500"
           }`}
         >
@@ -79,7 +93,6 @@ function App() {
         </button>
       </form>
 
-      {/* ✅ Items list */}
       <ul className="space-y-3">
         {items.map((item) => (
           <li
@@ -87,7 +100,8 @@ function App() {
             className="flex justify-between items-center bg-white p-4 rounded shadow hover:shadow-lg"
           >
             <span>
-              <strong>{item.name}</strong> - {item.description}
+              <strong>{item.name}</strong> - {item.description} -{" "}
+              <em>{item.weight ?? "0.0"}</em> kg
             </span>
             <div className="space-x-2">
               <button

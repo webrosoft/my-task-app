@@ -7,3 +7,9 @@ __pycache__/
 *.log
 frontend/dist/
 backend/.venv/
+
+# Ignore Alembic bytecode caches and logs
+backend/alembic/__pycache__/
+backend/alembic/versions/__pycache__/
+backend/alembic/*.log
+
